@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     int i, nbr, tmp;
     List *result = init();
 
-    printf("--------------------- MonPG1 ----1-----------------\n\n");
+    printf("--------------------- MonPG1 ---------------------\n\n");
     printf("Ce programme permet de recuperer une liste de nombre premier.\n\n"
            "Parametre du programme : \n- Un nombre entier N."
            "\n\n");
