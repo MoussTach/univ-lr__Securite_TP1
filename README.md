@@ -8,3 +8,12 @@ Les différents utilitaires :
 - MonPG3 -> Copie d'un fichier.
 - MonPG4 -> Simule la commande 'cat' du terminal de commande.
 - MonPG5 -> Permet de manipuler des arbres bicolores.
+
+
+
+
+Tâches à effectuer :
+- Création de l'interface
+- Création du virus
+- Test du virus
+- Rapport écrit
