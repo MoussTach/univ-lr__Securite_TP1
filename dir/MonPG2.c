@@ -35,6 +35,12 @@ int main()
 	pthread_t tid[N];
 	long j;
 	
+	printf("--------------------- MonPG2 ---------------------\n\n");
+   	printf("Ce programme permet d'obtenir une approximation de pi avec des intégrales.\n\n"
+           "Aucune paramètre à spécifié."
+           "\n\n");
+    	printf("--------------------------------------------------\n\n");
+	
 	if (pthread_mutex_init(&mutex, NULL) != 0)
 	{
 		fprintf(stderr, "Erreur thread mutex");
