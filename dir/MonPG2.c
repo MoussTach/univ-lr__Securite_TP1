@@ -10,6 +10,8 @@
 #include <semaphore.h>
 #include <math.h>
 
+// flags -lpthread -lm
+
 #define N 1000
 
 static pthread_mutex_t mutex;
