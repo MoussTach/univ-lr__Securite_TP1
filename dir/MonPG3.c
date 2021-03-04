@@ -17,7 +17,7 @@ int main(int argc, char** argv){
 		
 		printf("--------------------- MonPG3 ---------------------\n\n");
 		printf("Ce programme permet de copier le contenu d'un fichier dans un autre.\n\n"
-           "Parametres du programme : \n- Nom du fichier a lire N.\n- Nom du fichier copié"
+           "Parametres du programme : \n- Nom du fichier a lire.\n- Nom du fichier copié"
            "\n\n");
 		printf("--------------------------------------------------\n\n");
         
