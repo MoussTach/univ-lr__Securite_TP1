@@ -38,7 +38,7 @@ int main(){
     printf("S_IFREG: %d\n", S_IFREG);
 
     while ((entry = readdir(dirp)) != NULL) {
-        if(entry->d_type == 0 && entry->d_name[6] == '\0') {
+        if(entry->d_type == 0 && !strstr(entry->d_name,".old")) { // 8 sur Linux
             printf("Name: %s\tType: %d\t", entry->d_name, entry->d_type);
             sprintf(fichier,"%s%s",PATH,entry->d_name);
 
