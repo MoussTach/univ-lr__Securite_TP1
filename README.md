@@ -16,5 +16,7 @@ Tâches à effectuer :
 - Création de l'interface
 - Création du virus
   - Fonction pour récupérer les fichiers
+  - Fonction pour vérifier si un fichier est déjà infecté
+  - Fonction pour infecter le fichier
 - Test du virus
 - Rapport écrit
