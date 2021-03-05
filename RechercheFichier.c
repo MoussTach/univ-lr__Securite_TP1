@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define PATH "/Boulot/L3/S6/SECURITE/TP/VIRUS/programmes/"
+#define PATH "/home/mousstach/Bureau/univ-lr/L3/semestre6/univ-lr__Securite_TP1/dir/"
 
 /*bool isInfected(char* file, char* path){
     DIR *dirp2;
@@ -31,7 +31,7 @@ int main(){
     struct dirent *entry;
 
     struct stat s;
-    char fichier[300];
+    char *fichier;
     dirp = opendir(PATH);
 
     printf("S_IXUSR: %d\n", S_IXUSR);
@@ -43,7 +43,11 @@ int main(){
             sprintf(fichier,"%s%s",PATH,entry->d_name);
 
             if (stat(fichier, &s) != -1) {
-                printf("Mode: %hu\n", s.st_mode);
+                if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)) {
+                    printf("\tMode: %hu\n", s.st_mode);
+                    printf("\tuser ID: %hu\n", s.st_uid);
+                    printf("\tGroup ID: %hu\n", s.st_gid);
+                }
             }
 
 

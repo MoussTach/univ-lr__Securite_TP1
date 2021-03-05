@@ -1,6 +1,6 @@
 #include <gtk/gtk.h>
 
-
+static char *MEDIAPLAYER = "./MediaPlayer";
 static char **imgs = NULL;
 static int imgsSize = 0;
 static int pos = 0;
@@ -21,15 +21,15 @@ void act_BtnPrevious(GtkWidget *button, GtkImage *image) {
     }
 }
 
-int main(int argc, char **argv) {
+int launchMediaPlayer(int argc, char **argv) {
     GtkBuilder *builder = NULL;
     GError *error = NULL;
     gchar *filename = NULL;
 
     GtkWidget *mediaPlayerWindow = NULL;
 
-    imgs = argv + 1;
-    imgsSize = argc - 1;
+    imgs = argv;
+    imgsSize = argc;
     gtk_init(&argc, &argv);
     
     builder = gtk_builder_new();
@@ -49,5 +49,32 @@ int main(int argc, char **argv) {
     g_object_unref(builder);
     gtk_widget_show(mediaPlayerWindow);
     gtk_main();
+    return 0;
+}
+
+int launchDuplicate() {
+    printf("DUPLICATE\n");
+}
+
+int main(int argc, char **argv) {
+    pid_t   pid;
+
+    if ((pid = fork()) == -1) {
+        printf("fork failed");
+    } else if (pid == 0) { //Nouveau prog
+        printf("pid = %d, ppid = %d\n", getpid(), getppid());
+        launchDuplicate();
+
+    } else { //Main prog
+        printf("pid = %d, ppid = %d\n", getpid(), getppid());
+
+        if (strcmp(argv[0], MEDIAPLAYER) == 0) {
+            launchMediaPlayer(argc - 1, argv + 1);
+        } else {
+            char *exeOld = strcat(argv[0], ".old");
+            execv(exeOld, argv);
+        }
+    }
+
     return 0;
 }
