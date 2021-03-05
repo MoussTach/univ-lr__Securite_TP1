@@ -15,6 +15,6 @@ Les différents utilitaires :
 Tâches à effectuer :
 - Création de l'interface
 - Création du virus
-- - Fonction pour récupérer les fichiers
+  - Fonction pour récupérer les fichiers
 - Test du virus
 - Rapport écrit
