@@ -9,7 +9,7 @@
 
 #define PATH "/Boulot/L3/S6/SECURITE/TP/VIRUS/programmes/"
 
-bool isInfected(char* file, char* path){
+/*bool isInfected(char* file, char* path){
     DIR *dirp2;
     struct dirent *ligne;
     char cible[30];
@@ -56,10 +56,10 @@ int main(){
             }
         }
     }
-}
+}*/
 
 
-/*typedef struct Element Element;
+typedef struct Element Element;
 struct Element
 {
     char fichier[100];
@@ -138,14 +138,18 @@ List* insert(List *l, char* file)
     }
     return l;
 }
+
 int main(){
     DIR *dirp;
     struct dirent *entry;
     struct stat s;
     char fichier[300];
     dirp = opendir(PATH);
+
     List *exec = NULL;
     List *old = NULL;
+    List *cible = NULL;
+
     while ((entry = readdir(dirp)) != NULL) {
         sprintf(fichier,"%s%s",PATH,entry->d_name);
         if (stat(fichier, &s) != -1) {
@@ -161,8 +165,20 @@ int main(){
             }
         }
     }
-    printList(exec);
+    
+    Element *actuel = exec->p;
+    while (actuel != NULL)
+    {
+        if (isInfected(actuel->fichier, old) == false)
+        {
+            cible = insert(cible, actuel->fichier);
+        }
+        actuel = actuel->e;
+    }
+
+    free(exec);
+    free(old);
+    printList(cible);
     printf("fin\n");
     return EXIT_SUCCESS;
 }
-*/
