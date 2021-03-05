@@ -15,5 +15,8 @@ Les différents utilitaires :
 Tâches à effectuer :
 - Création de l'interface
 - Création du virus
+  - Fonction pour récupérer les fichiers
+  - Fonction pour vérifier si un fichier est déjà infecté (isInfected)
+  - Fonction pour infecter le virus dans le fichier
 - Test du virus
 - Rapport écrit
