@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -18,7 +17,7 @@ int main(int argc, char **argv){
 	
 	printf("--------------------- MonPG4 ---------------------\n\n");
 	printf("Ce programme simule la commande 'cat' du terminal de commande.\n\n"
-           "Parametres du programme : \n- Nom du fichier où l'on souhaite ecrire.\n"
+           "Input : \n- Nom du fichier où l'on souhaite ecrire.\n"
            "\n\n");
 	printf("--------------------------------------------------\n\n");
 	
