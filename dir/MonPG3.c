@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -17,7 +17,7 @@ int main(int argc, char** argv){
 		
 		printf("--------------------- MonPG3 ---------------------\n\n");
 		printf("Ce programme permet de copier le contenu d'un fichier dans un autre.\n\n"
-           "Parametres du programme : \n- Nom du fichier a lire.\n- Nom du fichier copié"
+           "Parametres du programme : \n- Nom du fichier a lire.\n- Nom du fichier copie"
            "\n\n");
 		printf("--------------------------------------------------\n\n");
         
@@ -45,12 +45,15 @@ int main(int argc, char** argv){
              
              close(fdIn);
              close(fdOut);
+
+             printf("Copie terminee avec succes !\n");
+
              exit(EXIT_SUCCESS);
              
         }
         else
         {
-                fprintf(stderr,"Cette fonction necessite 2 arguments");
+                fprintf(stderr,"Cette fonction necessite 2 arguments\n");
                 exit(EXIT_FAILURE);  
         }
 }
