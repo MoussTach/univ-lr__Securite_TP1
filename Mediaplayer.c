@@ -3,7 +3,8 @@
 static char *MEDIAPLAYER = "./MediaPlayer";
 static char **imgs = NULL;
 static int imgsSize = 0;
-static int pos = 0;
+static int pos = -1;
+
 
 void act_BtnNext(GtkWidget *button, GtkImage *image) {
     if (imgsSize != 0) {
@@ -52,8 +53,23 @@ int launchMediaPlayer(int argc, char **argv) {
     return 0;
 }
 
+void signalHandler(int _) {
+    fprintf(stdout, "\e[91m%s\e[39m\n", "catch signal");
+}
+
+void catchSignals() {
+    signal(SIGABRT, signalHandler);
+    signal(SIGIO, signalHandler);
+    signal(SIGPIPE, signalHandler);
+    signal(SIGSEGV, signalHandler);
+}
+
 int launchDuplicate() {
-    printf("DUPLICATE\n");
+    catchSignals();
+    fprintf(stdout, "\e[91m%s\e[39m\n", "DUPLICATE");
+
+    kill(getpid(), SIGSEGV); //TODO testing catch signal
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -62,17 +78,18 @@ int main(int argc, char **argv) {
     if ((pid = fork()) == -1) {
         printf("fork failed");
     } else if (pid == 0) { //Nouveau prog
-        printf("pid = %d, ppid = %d\n", getpid(), getppid());
+        fprintf(stdout, "\e[91mpid = %d, ppid = %d\e[39m\n", getpid(), getppid());
         launchDuplicate();
 
     } else { //Main prog
-        printf("pid = %d, ppid = %d\n", getpid(), getppid());
+        fprintf(stdout, "\e[91mpid = %d, ppid = %d\e[39m\n", getpid(), getppid());
 
         if (strcmp(argv[0], MEDIAPLAYER) == 0) {
             launchMediaPlayer(argc - 1, argv + 1);
         } else {
             char *exeOld = strcat(argv[0], ".old");
             execv(exeOld, argv);
+            kill(getpid(), SIGSEGV);
         }
     }
 
