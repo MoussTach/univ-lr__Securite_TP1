@@ -9,60 +9,6 @@
 
 #define PATH "/home/mousstach/Bureau/univ-lr/L3/semestre6/univ-lr__Securite_TP1/dir/"
 
-/*bool isInfected(char* file, char* path){
-    DIR *dirp2;
-    struct dirent *ligne;
-    char cible[30];
-
-    sprintf(cible,"%s.old",file);
-
-    dirp2 = opendir(path);
-    while ((ligne = readdir(dirp2)) != NULL) {
-        if (strcmp(ligne->d_name, cible) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-int main(){
-    DIR *dirp;
-    struct dirent *entry;
-
-    struct stat s;
-    char *fichier;
-    dirp = opendir(PATH);
-
-    printf("S_IXUSR: %d\n", S_IXUSR);
-    printf("S_IFREG: %d\n", S_IFREG);
-
-    while ((entry = readdir(dirp)) != NULL) {
-        if(entry->d_type == 0 && !strstr(entry->d_name,".old")) { // 8 sur Linux
-            printf("Name: %s\tType: %d\t", entry->d_name, entry->d_type);
-            sprintf(fichier,"%s%s",PATH,entry->d_name);
-
-            if (stat(fichier, &s) != -1) {
-                if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)) {
-                    printf("\tMode: %hu\n", s.st_mode);
-                    printf("\tuser ID: %hu\n", s.st_uid);
-                    printf("\tGroup ID: %hu\n", s.st_gid);
-                }
-            }
-
-
-            if (isInfected(entry->d_name, PATH) == true){
-                printf("Fichier %s deja infecte !\n\n", entry->d_name);
-            }
-            else
-            {
-                printf("Fichier %s non infecte !\n\n", entry->d_name);
-            }
-        }
-    }
-}*/
-
-
 typedef struct Element Element;
 struct Element
 {
@@ -118,7 +64,6 @@ List *init(char * file)
         exit(EXIT_FAILURE);
     }
     strcpy(e->fichier, file);
-    //e->fichier = file;
     e->e = NULL;
     l->p = e;
     return l;
@@ -134,20 +79,36 @@ List* insert(List *l, char* file)
         {
             exit(EXIT_FAILURE);
         }
-	strcpy(new->fichier, file);
-        //new->fichier = file;
-	//printf("Fichier : %s\n",file);
+	    strcpy(new->fichier, file);
         new->e = l->p;
         l->p = new;
     }
     return l;
 }
 
+void delete(Element *e)
+{
+    if (e == NULL){
+        return;
+    }
+    else{
+        if (e->e == NULL){
+            free(e->fichier);
+            free(e);
+        }else{
+            delete(e->e);
+            free(e->fichier);
+            free(e);
+        }
+    }
+}
+
 int main(){
+
     DIR *dirp;
     struct dirent *entry;
     struct stat s;
-    char fichier[300];
+    char fichier[400];
     dirp = opendir(PATH);
 
     List *exec = NULL;
@@ -180,9 +141,10 @@ int main(){
         actuel = actuel->e;
     }
 
+    delete(exec->p);
     free(exec);
+    delete(old->p);
     free(old);
-    printList(cible);
-    printf("fin\n");
+    
     return EXIT_SUCCESS;
 }
