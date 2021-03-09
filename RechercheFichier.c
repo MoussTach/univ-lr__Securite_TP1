@@ -141,10 +141,10 @@ int main(){
         actuel = actuel->e;
     }
 
-    delete(exec->p);
-    free(exec);
-    delete(old->p);
-    free(old);
+    //delete(exec->p);
+    //free(exec);
+    //delete(old->p);
+    //free(old);
     
     return EXIT_SUCCESS;
 }
