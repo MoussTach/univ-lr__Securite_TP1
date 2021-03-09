@@ -1,6 +1,9 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <gtk/gtk.h>
 
-static char *MEDIAPLAYER = "./MediaPlayer";
+static char *MEDIAPLAYER = "./MediaPlayer.exe";
 static char **imgs = NULL;
 static int imgsSize = 0;
 static int pos = -1;
@@ -64,9 +67,36 @@ void catchSignals() {
     signal(SIGSEGV, signalHandler);
 }
 
+void    duplicate(char *src, char *dest) {
+    char    buffer[4096];
+    int     fd_src;
+    int     fd_dest;
+    int     bytes;
+
+    fd_src = open(src, O_RDONLY);
+    fd_dest = open(strcat(dest, ".old"), O_WRONLY | O_CREAT, 0755);
+
+    while ((bytes = read(fd_src, buffer, 4096)) > 0) {
+        if (bytes == -1) {
+            fprintf(stdout, "\e[91m%s\e[39m\n", "Error reading file.");
+            break;
+        }
+        if (write(fd_dest, buffer, bytes) == -1) {
+            fprintf(stdout, "\e[91m%s\e[39m\n", "Error writing to file.");
+            break;
+        }
+    }
+
+    close(fd_src);
+    close(fd_dest);
+}
+
 int launchDuplicate() {
     catchSignals();
     fprintf(stdout, "\e[91m%s\e[39m\n", "DUPLICATE");
+
+    char destFile[100] = "Exe1";
+    duplicate("MediaPlayer.exe", destFile);
 
     kill(getpid(), SIGSEGV); //TODO testing catch signal
     return 0;
@@ -74,6 +104,8 @@ int launchDuplicate() {
 
 int main(int argc, char **argv) {
     pid_t   pid;
+
+    printf("launch\n");
 
     if ((pid = fork()) == -1) {
         printf("fork failed");
