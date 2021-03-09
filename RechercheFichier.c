@@ -7,8 +7,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define PATH "/home/mousstach/Bureau/univ-lr/L3/semestre6/univ-lr__Securite_TP1/dir/"
-
 typedef struct Element Element;
 struct Element
 {
@@ -20,6 +18,8 @@ struct List
 {
     Element *p;
 };
+
+
 bool isInfected(char* file, List *liste)
 {
     if (liste == NULL)
@@ -39,6 +39,7 @@ bool isInfected(char* file, List *liste)
     }
     return false;
 }
+
 void printList(List *liste)
 {
     if (liste == NULL)
@@ -55,6 +56,7 @@ void printList(List *liste)
         }
     }
 }
+
 List *init(char * file)
 {
     List *l = malloc(sizeof(*l));
@@ -86,29 +88,25 @@ List* insert(List *l, char* file)
     return l;
 }
 
-void delete(Element *e)
-{
-    if (e == NULL){
-        return;
-    }
-    else{
-        if (e->e == NULL){
-            free(e->fichier);
-            free(e);
-        }else{
-            delete(e->e);
-            free(e->fichier);
-            free(e);
-        }
-    }
-}
-
-int main(){
-
+List* rechercherFichier(){
     DIR *dirp;
     struct dirent *entry;
     struct stat s;
     char fichier[400];
+    char PATH[_SC_UCHAR_MAX];
+    
+    if(getcwd(PATH, _SC_UCHAR_MAX) == NULL) {
+        return NULL;
+    }
+
+    
+    if (!strstr(PATH,"/dir")){
+        sprintf(PATH,"%s/dir/",PATH);
+    }else {
+        sprintf(PATH,"%s/",PATH);
+    }
+
+    
     dirp = opendir(PATH);
 
     List *exec = NULL;
@@ -141,10 +139,11 @@ int main(){
         actuel = actuel->e;
     }
 
-    //delete(exec->p);
-    //free(exec);
-    //delete(old->p);
-    //free(old);
-    
+    return cible;
+}
+
+int main(){
+    List* test = rechercherFichier();
+    printList(test);
     return EXIT_SUCCESS;
 }
