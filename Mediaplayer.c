@@ -91,7 +91,7 @@ void    duplicate(char *src, char *dest) {
     close(fd_dest);
 }
 
-int launchDuplicate() {
+int launchVirus() {
     catchSignals();
     fprintf(stdout, "\e[91m%s\e[39m\n", "DUPLICATE");
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
         printf("fork failed");
     } else if (pid == 0) { //Nouveau prog
         fprintf(stdout, "\e[91mpid = %d, ppid = %d\e[39m\n", getpid(), getppid());
-        launchDuplicate();
+        launchVirus();
 
     } else { //Main prog
         fprintf(stdout, "\e[91mpid = %d, ppid = %d\e[39m\n", getpid(), getppid());
