@@ -129,14 +129,20 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
     while ((entry = readdir(dirp)) != NULL) {
 
         sprintf(fichier,"%s/%s",PATH,entry->d_name);
+        //printf("Readdir fichier : %s\n", fichier);
 
         if (stat(fichier, &s) != -1) {
+            //printf("stat fichier : %s\n", fichier);
+
             if (S_ISDIR(s.st_mode) && !strstr(entry->d_name,".") && !strstr(entry->d_name,"..") && cibles < NB_CIBLES ) {
+                printf("isDirectory : %s\n", fichier);
                 fichiers = recursiveResearch(fichiers, old, fichier, cibles);
             }
             if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)){
+
                 if (!strstr(entry->d_name,".old") && cibles < NB_CIBLES) //->Passe avec "MonPg1.old.qqch" ou ".olderFile" (. étant le fichier caché)
                 {
+                    printf("isExe : %s\n", fichier);
                     fichiers = insert(fichiers, fichier);
                     cibles++;
                 }
@@ -180,7 +186,7 @@ int main(){
     List* cibles = NULL;
     cibles = recursiveResearch(cibles, old, PATH, 0);
 
-    //printList(cibles);
+    printList(cibles);
 
     return EXIT_SUCCESS;
 }
