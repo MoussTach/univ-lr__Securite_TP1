@@ -65,7 +65,7 @@ List* insert(List *list, char* file)
         {
             exit(EXIT_FAILURE);
         }
-	    strcpy(newElem->fichier, file);
+        strcpy(newElem->fichier, file);
         if (!list && !list->p) {
             list->p->next = newElem;
         }
@@ -125,9 +125,9 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
 
     dirp = opendir(PATH);
     char fichier[500];
-    
+
     while ((entry = readdir(dirp)) != NULL) {
-        
+
         sprintf(fichier,"%s/%s",PATH,entry->d_name);
 
         if (stat(fichier, &s) != -1) {
@@ -139,7 +139,7 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
                 {
                     fichiers = insert(fichiers, fichier);
                     cibles++;
-                } 
+                }
                 else
                 {
                     old = insert(old, fichier);
@@ -171,7 +171,7 @@ List* recursiveResearch(List* fichiers, List* old, char* PATH, int cibles){
 
 int main(){
     char PATH[_SC_UCHAR_MAX];
-    
+
     if(getcwd(PATH, _SC_UCHAR_MAX) == NULL) {
         return EXIT_FAILURE;
     }
