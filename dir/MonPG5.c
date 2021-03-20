@@ -287,47 +287,49 @@ Node* successeur(Node *x) {
 //----------------------------------------
 
 void supprimer(Node *T, Node *z) {
-    Node *x = NULL;
-    Node *y = NULL;
-    if (z->left==NULL || z->right==NULL) {
-        y = z;
-    } else {
-        y = successeur(z);
-        printf("Valeur y : %d\n", y->data);
-
-    }
-    if (y->left == NULL && y->right == NULL) {
-        x = y;
-    } else {
-        if(y->left) {
-            x = y->left;
+    if (T && z) {
+        Node *x = NULL;
+        Node *y = NULL;
+        if (z->left==NULL || z->right==NULL) {
+            y = z;
         } else {
-            x = y->right;
+            y = successeur(z);
+            printf("Valeur y : %d\n", y->data);
+
         }
+        if (y->left == NULL && y->right == NULL) {
+            x = y;
+        } else {
+            if(y->left) {
+                x = y->left;
+            } else {
+                x = y->right;
+            }
+        }
+        x->parent = y->parent;
+        if (y->parent == NULL) {
+            T = x;
+        }
+        else if (y==y->parent->left) {
+            y->parent->left = x;
+        }
+        else {
+            y->parent->right = x;
+        }
+        if (y!=z) {
+            z->data = y->data;
+        }
+        if (y->color == NOIR) {
+            supprimer_correction(T,x);
+        }
+        if(y->parent->left == y) {
+            y->parent->left=NULL;
+        }
+        if(y->parent->right == y) {
+            y->parent->right=NULL;
+        }
+        free(y);
     }
-    x->parent = y->parent;
-    if (y->parent == NULL) {
-        T = x;
-    }
-    else if (y==y->parent->left) {
-        y->parent->left = x;
-    }
-    else {
-        y->parent->right = x;
-    }
-    if (y!=z) {
-        z->data = y->data;
-    }
-    if (y->color == NOIR) {
-        supprimer_correction(T,x);
-    }
-    if(y->parent->left == y) {
-        y->parent->left=NULL;
-    }
-    if(y->parent->right == y) {
-        y->parent->right=NULL;
-    }
-    free(y);
 }
 
 //----------------------------------------
